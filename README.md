@@ -1,91 +1,93 @@
-# Sistema de Operação da Loja
+# Store Operations System
 
-Projeto de aprendizado aplicado: vamos construir um sistema Java para apoiar estoque, recebimento de mercadorias e expedição de pedidos, tomando decisões como em um projeto real.
+**Languages:** English | [Português (Brasil)](README.pt-BR.md)
 
-## Objetivos do primeiro ciclo
+An applied learning project: we are building a Java system to support inventory, goods receiving, and order fulfillment, making decisions as we would in a real-world project.
 
-- Registrar produtos e suas unidades de medida.
-- Receber mercadorias e conferir quantidades recebidas.
-- Registrar a entrada física digitando o nome do produto; buscar e selecionar um produto existente ou abrir seu cadastro, depois informar quantidade e alocação.
-- Manter saldo de estoque e histórico de movimentações.
-- Orientar a retirada física antes da emissão da NF e vincular depois o XML da venda.
-- Conferir, embalar e registrar ocorrências do atendimento.
-- Importar manualmente o XML da NF de venda quando ele for necessário para associar a nota à venda e gerar a etiqueta de conferência; a entrada de mercadoria não depende do XML do fornecedor.
-- Registrar, por venda, o líquido previsto de marketplace e conciliar o crédito efetivo pelo ID da venda com o extrato bancário.
-- Fazer a conciliação com lançamentos manuais do extrato no primeiro recorte.
-- Guardar o vídeo da embalagem por três meses, vinculado à venda.
-- Manter os vídeos em armazenamento local persistente do servidor, com remoção automática após três meses.
-- Acompanhar os serviços com logs centralizados, métricas e rastros no Grafana.
-- Consultar operações e rastrear quem fez cada ação.
+## First iteration goals
 
-## Organização do projeto
+- Register products and their units of measure.
+- Record goods receiving and verify received quantities.
+- Record physical stock intake by typing a product name, searching for and selecting an existing product or creating a new one, then entering the quantity and storage allocation.
+- Track stock balances and movement history.
+- Guide physical picking before an invoice is issued, then link the sales XML afterward.
+- Check and pack orders and record fulfillment events.
+- Manually import a sales invoice XML when needed to associate the invoice with a sale and generate a checking label. Goods intake does not depend on the supplier's XML.
+- Record the expected marketplace payout for each sale and reconcile the actual credit by sale ID against the bank statement.
+- Reconcile transactions using manual bank statement entries in the first iteration.
+- Keep packing videos linked to the sale for three months.
+- Store videos on persistent local server storage and delete them automatically after three months.
+- Monitor services using centralized logs, metrics, and traces in Grafana.
+- Review operations and track who performed each action.
 
-O backend é o foco. O front-end será feito em React e ficará separado do backend. Python poderá entrar depois em uma integração ou tarefa que se beneficie dele, como análise de dados ou processamento em lote; não será criado um serviço Python sem uma necessidade de negócio definida.
+## Project organization
 
-Antes de implementar, vamos trabalhar em `docs/` para levantar processos, regras de negócio, modelo de domínio, diagramas e decisões técnicas. Os diagramas e regras iniciais serão hipóteses, validadas com exemplos da operação da loja.
+The backend is the primary focus. The front end will be built with React and kept separate from the backend. Python may be introduced later for an integration or task where it provides a clear benefit, such as data analysis or batch processing; we will not create a Python service without a defined business need.
 
-Documentos de análise atuais:
+Before implementation, we will use `docs/` to document processes, business rules, the domain model, diagrams, and technical decisions. Initial diagrams and rules are hypotheses to be validated against real examples from the store's operations.
 
-- [Escopo e domínio](docs/01-escopo-e-dominio.md)
-- [Modelo do domínio e fluxos](docs/02-modelo-do-dominio.md)
-- [Cenários operacionais](docs/03-cenarios-operacionais.md)
-- [Fronteiras dos microserviços](docs/04-fronteiras-de-servicos.md)
-- [Observabilidade com Grafana](docs/05-observabilidade.md)
+Current analysis documents (currently written in Portuguese):
 
-Estrutura pretendida, sujeita à decisão sobre monorepo e limites dos serviços:
+- [Scope and domain](docs/01-escopo-e-dominio.md)
+- [Domain model and workflows](docs/02-modelo-do-dominio.md)
+- [Operational scenarios](docs/03-cenarios-operacionais.md)
+- [Microservice boundaries](docs/04-fronteiras-de-servicos.md)
+- [Observability with Grafana](docs/05-observabilidade.md)
+
+Planned structure, subject to decisions about the monorepo and service boundaries:
 
 ```text
 MF_Sistema/
-├── docs/                  # processos, regras, diagramas e decisões
-├── backend/               # serviços Java/Spring Boot
-├── frontend/              # aplicação React
-└── python/                # somente quando houver um caso de uso claro
+├── docs/                  # processes, rules, diagrams, and decisions
+├── backend/               # Java/Spring Boot services
+├── frontend/              # React application
+└── python/                # only when there is a clear use case
 ```
 
-## Arquitetura inicial
+## Initial architecture
 
-O sistema será dividido por capacidades de negócio. A divisão abaixo é uma hipótese de partida; vamos validá-la enquanto levantamos as regras da loja.
+The system will be divided by business capabilities. The breakdown below is a starting hypothesis and will be validated as we learn more about the store's rules.
 
-| Serviço | Responsabilidade principal |
+| Service | Main responsibility |
 | --- | --- |
-| `discovery-server` | Registro e descoberta de serviços com Eureka. |
-| `config-server` | Configuração externa e compartilhada dos serviços. |
-| `api-gateway` | Entrada HTTP, roteamento e políticas comuns de API. |
-| `rabbitmq` | Mensageria durável para eventos entre serviços, com retentativa e dead-letter queue. |
-| `catalog-service` | Cadastro e consulta de produtos. |
-| `inventory-service` | Estoque físico por caixa/posição, saldos e movimentações. |
-| `receiving-service` | Registro, conferência e alocação de mercadoria recebida. |
-| `sales-service` | Vendas online confirmadas pelo XML importado manualmente e vendas presenciais registradas no sistema. |
-| `fulfillment-service` | Conferência, embalagem e registro da evidência do processo. |
-| `finance-service` | Repasses de marketplace e conciliação com lançamentos do extrato bancário. |
+| `discovery-server` | Service registration and discovery with Eureka. |
+| `config-server` | External, shared configuration for services. |
+| `api-gateway` | HTTP entry point, routing, and shared API policies. |
+| `rabbitmq` | Durable messaging for inter-service events, with retries and a dead-letter queue. |
+| `catalog-service` | Product registration and lookup. |
+| `inventory-service` | Physical stock by box/position, balances, and movements. |
+| `receiving-service` | Recording, checking, and allocating received goods. |
+| `sales-service` | Online sales confirmed through manually imported XML and in-store sales recorded in the system. |
+| `fulfillment-service` | Order checking, packing, and process evidence. |
+| `finance-service` | Marketplace payouts and reconciliation against bank statement entries. |
 
-Serviços terão limites claros e serão donos dos próprios dados. A Olist continua responsável pelos pedidos online, emissão de NF e etiqueta de marketplace; o sistema novo registra entradas manualmente e importa o XML de venda quando necessário para apoiar conferência, embalagem e financeiro. Chamadas síncronas atendem pesquisas/respostas imediatas; RabbitMQ distribui eventos duráveis de negócio entre serviços, com outbox, confirmação, retentativa e consumidores idempotentes.
+Each service will have clear boundaries and own its data. Olist remains responsible for online orders, invoice issuance, and marketplace shipping labels. The new system records goods intake manually and imports sales XML when needed to support checking, packing, and financial reconciliation. Synchronous calls handle lookups and immediate responses; RabbitMQ distributes durable business events between services using an outbox, acknowledgements, retries, and idempotent consumers.
 
-## Princípios de implementação
+## Implementation principles
 
-- Java com Spring Boot e Maven; Lombok para reduzir código repetitivo quando melhorar a leitura.
-- SOLID e padrões de projeto usados para resolver problemas concretos, sem criar abstrações sem necessidade.
-- Sem setters nas classes de domínio. Mudanças serão expressas por métodos de negócio, por exemplo `confirmarRecebimento()` ou `reservar(...)`.
-- Correções de dados serão ações explícitas do domínio, não setters genéricos. A entidade valida a alteração; o caso de uso coordena gravação e histórico; o repositório persiste cada responsabilidade separadamente.
-- Imutabilidade sempre que fizer sentido. Entidades persistidas podem precisar de construtores e mapeamentos específicos do JPA; isso será tratado sem expor setters públicos.
-- Herança será usada com parcimônia, quando houver uma relação “é um” estável. Composição será preferida quando representar melhor o domínio.
-- APIs versionadas, validação de entrada, tratamento consistente de erros, logs e testes automatizados focados nas regras de negócio.
-- Testes serão escritos e executados junto com cada fatia implementada: testes unitários para regras de domínio e testes de integração para APIs, persistência e mensageria quando esses componentes entrarem no fluxo.
-- Docker e Docker Compose para executar a aplicação e suas dependências localmente.
+- Java with Spring Boot and Maven; use Lombok to reduce repetitive code when it improves readability.
+- Apply SOLID principles and design patterns to solve concrete problems, without introducing abstractions without a need.
+- No setters in domain classes. Changes will be expressed through business methods such as `confirmReceiving()` or `reserve(...)`.
+- Data corrections will be explicit domain actions, not generic setters. The entity validates the change; the use case coordinates persistence and history; the repository handles persistence separately.
+- Prefer immutability where it makes sense. Persisted entities may need specific constructors and JPA mappings; we will handle that without exposing public setters.
+- Use inheritance sparingly, when there is a stable “is-a” relationship. Prefer composition when it better represents the domain.
+- Versioned APIs, input validation, consistent error handling, logs, and automated tests focused on business rules.
+- Tests will be written and run with each implemented slice: unit tests for domain rules and integration tests for APIs, persistence, and messaging as those components enter the workflow.
+- Use Docker and Docker Compose to run the application and its dependencies locally.
 
-## Caminho de construção
+## Development roadmap
 
-1. Entender a operação atual da loja e desenhar os fluxos e regras.
-2. Definir o primeiro recorte funcional e os estados de cada processo.
-3. Preparar estrutura Maven, convenções e execução local com Docker.
-4. Implementar uma fatia vertical pequena, do endpoint até persistência e regra de negócio.
-5. Cobrir e exercitar cenários reais com testes, como recebimento, reaproveitamento de posições vazias, estoque insuficiente, cancelamento e conciliação divergente.
-6. Evoluir observabilidade, segurança e integração entre serviços conforme necessidade.
+1. Understand the store's current operations and map workflows and rules.
+2. Define the first functional slice and the states of each process.
+3. Prepare the Maven structure, conventions, and local Docker setup.
+4. Implement a small vertical slice, from the endpoint through persistence and business rules.
+5. Cover and exercise real scenarios with tests, such as receiving goods, reusing empty positions, insufficient stock, cancellation, and reconciliation discrepancies.
+6. Expand observability, security, and inter-service integration as needed.
 
-## Decisões ainda em aberto
+## Open decisions
 
-- Detalhar os casos e efeitos de cancelamento/devolução ao longo do fluxo.
-- Detalhar as ações permitidas dentro de cada módulo funcional, começando por acessos de Estoque, Financeiro e demais módulos do sistema.
-- Definir o caminho do volume local exclusivo dos vídeos durante a implantação no servidor.
+- Detail the cases and effects of cancellations and returns at each stage of the workflow.
+- Detail the actions allowed in each functional module, starting with Inventory, Finance, and other system areas.
+- Choose the location of the dedicated local video volume during server deployment.
 
-Essas respostas definem o primeiro fluxo que vamos implementar. A arquitetura acima é deliberadamente inicial e pode mudar para acompanhar as regras reais.
+These decisions define the first workflow we will implement. The architecture is intentionally an initial proposal and may change to reflect the store's actual rules.
