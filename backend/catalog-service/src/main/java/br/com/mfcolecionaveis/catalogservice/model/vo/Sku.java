@@ -1,9 +1,7 @@
 package br.com.mfcolecionaveis.catalogservice.model.vo;
 
-public class Sku {
-    private String sku;
-
-    public Sku(String sku) {
+public record Sku(String sku) {
+    public Sku {
         if (sku == null || sku.isEmpty()) {
             throw new IllegalArgumentException("SKU não pode ser nulo ou vazio");
         }
@@ -13,10 +11,9 @@ public class Sku {
         if (!sku.matches("^[a-zA-Z0-9\\-]+$")) {
             throw new IllegalArgumentException("SKU contém caracteres inválidos");
         }
-        this.sku = sku;
     }
 
-    public String getSku() {
+    public String sku() {
         return sku;
     }
 }

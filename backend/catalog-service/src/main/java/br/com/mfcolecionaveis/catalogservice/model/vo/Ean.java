@@ -1,9 +1,7 @@
 package br.com.mfcolecionaveis.catalogservice.model.vo;
 
-public class Ean {
-    private String ean;
-
-    public Ean(String ean) {
+public record Ean(String ean) {
+    public Ean {
         if (ean == null || ean.isEmpty()) {
             throw new IllegalArgumentException("EAN não pode ser nulo ou vazio");
         }
@@ -13,10 +11,8 @@ public class Ean {
         if (!ean.matches("^[0-9]+$")) {
             throw new IllegalArgumentException("EAN contém caracteres inválidos");
         }
-        this.ean = ean;
     }
-
-    public String getEan() {
+    public String ean() {
         return ean;
     }
 }

@@ -1,0 +1,36 @@
+# Build artifacts
+HELP.md
+**/target/
+**/build/
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+**/.mvn/wrapper/maven-wrapper.jar
+
+# IDE files
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+.idea/
+*.iws
+*.iml
+*.ipr
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+.vscode/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Local session handoff notes
+/retomada.md

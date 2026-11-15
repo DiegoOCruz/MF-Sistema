@@ -1,4 +1,5 @@
 package br.com.mfcolecionaveis.catalogservice.model;
+
 import br.com.mfcolecionaveis.catalogservice.model.vo.Nome;
 import br.com.mfcolecionaveis.catalogservice.model.vo.NumeroFigura;
 import br.com.mfcolecionaveis.catalogservice.model.vo.Sku;
@@ -7,7 +8,7 @@ import br.com.mfcolecionaveis.catalogservice.model.vo.Ean;
 import lombok.Getter;
 import java.util.UUID;
 
-@Getter 
+@Getter
 public class Produto {
     private UUID id;
     private Nome nome;
@@ -15,9 +16,21 @@ public class Produto {
     private Ean ean;
     private TipoProduto tipoProduto;
     private NumeroFigura numeroFigura;
-    private Boolean ativo;
+    private boolean ativo;
 
-    public Produto(UUID id, Nome nome, Sku sku, Ean ean, TipoProduto tipoProduto, NumeroFigura numeroFigura, Boolean ativo) {
+    public Produto(Nome nome, Sku sku, Ean ean, TipoProduto tipoProduto, NumeroFigura numeroFigura, boolean ativo) {
+        this.id = UUID.randomUUID();
+        this.nome = nome;
+        this.sku = sku;
+        this.ean = ean;
+        this.tipoProduto = tipoProduto;
+        this.numeroFigura = numeroFigura;
+        this.ativo = ativo;
+    }
+
+    private Produto(UUID id, Nome nome, Sku sku, Ean ean,
+            TipoProduto tipoProduto, NumeroFigura numeroFigura,
+            boolean ativo) {
         this.id = id;
         this.nome = nome;
         this.sku = sku;
@@ -25,6 +38,12 @@ public class Produto {
         this.tipoProduto = tipoProduto;
         this.numeroFigura = numeroFigura;
         this.ativo = ativo;
+    }
+
+    public static Produto reconstituir(UUID id, Nome nome, Sku sku, Ean ean,
+            TipoProduto tipoProduto, NumeroFigura numeroFigura,
+            boolean ativo) {
+        return new Produto(id, nome, sku, ean, tipoProduto, numeroFigura, ativo);
     }
 
     public void ativar() {
@@ -75,8 +94,5 @@ public class Produto {
         }
         this.numeroFigura = numeroFigura;
     }
-
-    
-
 
 }

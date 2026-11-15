@@ -44,6 +44,21 @@ MF_Sistema/
 └── python/                # somente quando houver um caso de uso claro
 ```
 
+## Desenvolvimento local
+
+A configuração atual do Docker Compose sobe o `catalog-service` e seu banco PostgreSQL 17. O arquivo Compose fica na raiz do repositório; o `.env` local nessa pasta fornece `POSTGRES_PASSWORD` e é ignorado pelo Git. O Flyway controla o esquema do banco por scripts SQL versionados em `backend/catalog-service/src/main/resources/db/migration`. A migração `V1__create_produtos.sql` cria a tabela inicial `produtos`.
+
+Execute estes comandos a partir da raiz do repositório:
+
+```powershell
+docker compose up --build -d
+docker compose ps
+docker compose logs --tail=100 catalog-service
+docker compose exec catalog-db psql -U catalog_user -d catalog_db
+```
+
+O serviço fica disponível em `http://localhost:8081` e o PostgreSQL em `localhost:5432`. O volume nomeado `catalog_db_data` mantém os dados do banco quando os containers param. `docker compose down -v` também remove esse volume e os dados. A tabela `produto_laboratorio` usada na prática de SQL era temporária e não faz parte do esquema da aplicação.
+
 ## Arquitetura inicial
 
 O sistema será dividido por capacidades de negócio. A divisão abaixo é uma hipótese de partida; vamos validá-la enquanto levantamos as regras da loja.
@@ -72,7 +87,7 @@ Serviços terão limites claros e serão donos dos próprios dados. A Olist cont
 - Imutabilidade sempre que fizer sentido. Entidades persistidas podem precisar de construtores e mapeamentos específicos do JPA; isso será tratado sem expor setters públicos.
 - Herança será usada com parcimônia, quando houver uma relação “é um” estável. Composição será preferida quando representar melhor o domínio.
 - APIs versionadas, validação de entrada, tratamento consistente de erros, logs e testes automatizados focados nas regras de negócio.
-- Testes serão escritos e executados junto com cada fatia implementada: testes unitários para regras de domínio e testes de integração para APIs, persistência e mensageria quando esses componentes entrarem no fluxo.
+- Testes automatizados fazem parte do projeto. A implementação deles fica intencionalmente para depois das etapas iniciais de aprendizado de domínio e persistência.
 - Docker e Docker Compose para executar a aplicação e suas dependências localmente.
 
 ## Caminho de construção

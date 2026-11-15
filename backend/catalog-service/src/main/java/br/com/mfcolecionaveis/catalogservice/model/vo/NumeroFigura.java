@@ -1,9 +1,7 @@
 package br.com.mfcolecionaveis.catalogservice.model.vo;
 
-public class NumeroFigura {
-    private String numeroFigura;
-
-    public NumeroFigura(String numeroFigura) {
+public record NumeroFigura(String numeroFigura) {
+    public NumeroFigura {
         if (numeroFigura == null || numeroFigura.isEmpty()) {
             throw new IllegalArgumentException("Número da figura não pode ser nulo ou vazio");
         }
@@ -13,10 +11,9 @@ public class NumeroFigura {
         if (!numeroFigura.matches("^[a-zA-Z0-9]+$")) {
             throw new IllegalArgumentException("Número da figura contém caracteres inválidos");
         }
-        this.numeroFigura = numeroFigura;
     }
 
-    public String getNumeroFigura() {
+    public String numeroFigura() {
         return numeroFigura;
     }
 }

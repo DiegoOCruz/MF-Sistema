@@ -44,6 +44,21 @@ MF_Sistema/
 └── python/                # only when there is a clear use case
 ```
 
+## Local development
+
+The current Docker Compose setup runs the `catalog-service` and its PostgreSQL 17 database. The Compose file is at the repository root; the local `.env` file there supplies `POSTGRES_PASSWORD` and is ignored by Git. Flyway manages the database schema through versioned SQL files in `backend/catalog-service/src/main/resources/db/migration`. Migration `V1__create_produtos.sql` creates the initial `produtos` table.
+
+Run these commands from the repository root:
+
+```powershell
+docker compose up --build -d
+docker compose ps
+docker compose logs --tail=100 catalog-service
+docker compose exec catalog-db psql -U catalog_user -d catalog_db
+```
+
+The service is published at `http://localhost:8081` and PostgreSQL at `localhost:5432`. The named `catalog_db_data` volume keeps database data when containers stop. `docker compose down -v` also deletes that volume and its data. The `produto_laboratorio` table used for SQL practice was temporary and is not part of the application schema.
+
 ## Initial architecture
 
 The system will be divided by business capabilities. The breakdown below is a starting hypothesis and will be validated as we learn more about the store's rules.
@@ -72,7 +87,7 @@ Each service will have clear boundaries and own its data. Olist remains responsi
 - Prefer immutability where it makes sense. Persisted entities may need specific constructors and JPA mappings; we will handle that without exposing public setters.
 - Use inheritance sparingly, when there is a stable “is-a” relationship. Prefer composition when it better represents the domain.
 - Versioned APIs, input validation, consistent error handling, logs, and automated tests focused on business rules.
-- Tests will be written and run with each implemented slice: unit tests for domain rules and integration tests for APIs, persistence, and messaging as those components enter the workflow.
+- Automated tests are part of the project plan. Their implementation is intentionally deferred until after the initial domain and persistence learning steps.
 - Use Docker and Docker Compose to run the application and its dependencies locally.
 
 ## Development roadmap
