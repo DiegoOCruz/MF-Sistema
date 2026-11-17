@@ -12,8 +12,8 @@ Este documento inicia o levantamento do sistema. O modelo abaixo não é uma esp
 ## Operação informada pela loja
 
 - Loja de Funkos, action figures e Legos; um único depósito, sem controle de lote ou validade.
-- Todos os produtos têm SKU único. A tela deve facilitar a identificação por nome, número da figura e SKU/código, por exemplo, “Funko Nezuko 1264”. Funkos de tamanho normal ficam em caixas numeradas de 1 a 42, com capacidade de seis unidades por caixa. Cada unidade vendida libera uma posição; novas unidades ocupam posições vazias e, quando necessário, uma nova caixa é criada. A numeração das caixas é permanente.
-- O cadastro usa o nome de produto definido pela loja, igual ao nome utilizado na Olist. Na entrada física, o operador digita esse nome: o sistema sugere produtos existentes e, se não houver correspondência, permite abrir o cadastro. O SKU continua sendo o identificador único do produto. O nome ruim da NF do fornecedor não será usado para cadastrar ou localizar os itens no primeiro fluxo de entrada.
+- Todos os produtos têm SKU e EAN únicos, além de número da figura obrigatório. A identificação deve poder ser feita por nome, franquia e número da figura. A planilha de estoque atual registra caixas numeradas de 1 a 45, com capacidade de seis Funkos normais por caixa; a numeração é permanente. Cada unidade vendida libera uma posição, e a reposição reutiliza posições vazias antes de abrir outra caixa.
+- O cadastro usa o nome de produto definido pela loja, igual ao nome utilizado na Olist, e registra a franquia em campo próprio. Na entrada física, o operador digita esse nome: o sistema sugere produtos existentes e, se não houver correspondência, permite abrir o cadastro. SKU e EAN são identificadores únicos. O nome ruim da NF do fornecedor não será usado para cadastrar ou localizar os itens no primeiro fluxo de entrada.
 - Funkos médios e grandes permanecem na mesma embalagem em que são armazenados; ela acompanha o produto no envio e não é reutilizada após a expedição. O modelo deve distinguir a caixa intermediária do Funko médio da caixa `SN` do Funko grande, embora ambas sejam chamadas informalmente de `SN`. A loja aprovou QR code para a embalagem grande; sua aplicação à caixa intermediária ainda está em aberto.
 - Action figures ficam em uma caixa separada e não haverá novas compras; o saldo será vendido até acabar. Legos podem ficar fora do primeiro escopo.
 - Vendas de e-commerce são geradas no canal de venda e seguem para o Olist, que gerencia emissão de nota fiscal e etiqueta do marketplace. O plano atual da loja não oferece acesso à API; o MVP não dependerá de integração automática.
@@ -50,9 +50,9 @@ O MVP não enviará pedidos, estoque ou notas ao Olist. A API poderá ser reaval
 
 ## Entrada física e busca de produto
 
-O operador digita o nome usado no catálogo da loja e na Olist. Conforme digita, o sistema filtra os produtos existentes e mostra dados que ajudam a confirmar a escolha, como número da figura, SKU, código de barras e saldo/localização. A busca inclui itens com saldo zero para permitir reposição. Ao selecionar um produto, o sistema carrega seus dados e o operador informa a quantidade recebida.
+O operador digita o nome usado no catálogo da loja e na Olist. Conforme digita, o sistema filtra os produtos existentes por nome parcial; franquia e número da figura também podem ser usados para localizar o item. Os resultados mostram nome, franquia, número da figura, SKU e EAN. Saldo e localização vêm do serviço de estoque e incluem itens com saldo zero para permitir reposição. Ao selecionar um produto, o sistema carrega seus dados e o operador informa a quantidade recebida.
 
-Se não houver produto correspondente, o operador pode iniciar o cadastro com o nome definido pela loja (o mesmo usado na Olist) e preencher os demais dados de identificação, incluindo SKU único e código de barras quando disponível. Após salvar, o novo produto fica selecionável para a entrada. Para a alocação, o sistema sugere posições livres, priorizando as posições vagas de caixas já existentes; o operador pode ajustar a seleção antes de confirmar a entrada.
+Se não houver produto correspondente, o operador pode iniciar o cadastro com o nome definido pela loja (o mesmo usado na Olist) e preencher os dados de identificação: franquia, SKU único, EAN único, tipo e número da figura. Após salvar, o novo produto fica selecionável para a entrada. Para a alocação, o sistema sugere posições livres, priorizando as posições vagas de caixas já existentes; o operador pode ajustar a seleção antes de confirmar a entrada.
 
 O XML da nota de fornecedor não é necessário para dar entrada no estoque neste primeiro fluxo. Isso evita que a descrição inconsistente do fornecedor substitua ou determine o nome de catálogo. O XML da nota de venda permanece previsto no processo de expedição quando necessário para associar a NF à venda e gerar a etiqueta de conferência.
 
@@ -80,6 +80,7 @@ classDiagram
         +String nome
         +String numeroFigura
         +String ean
+        +String franquia
         +TipoProduto tipoProduto
         +UnidadeMedida unidade
         +boolean ativo
@@ -227,7 +228,7 @@ O diagrama ainda não detalha devolução nem cancelamento. A entrada registra o
 
 ## Regras candidatas para validar
 
-1. SKU identifica cada produto de forma única (confirmado).
+1. SKU e EAN identificam cada produto de forma única, e todos os produtos têm ambos; número da figura é obrigatório para todos (confirmado).
 2. Uma caixa numerada comporta até seis Funkos normais; cada posição comporta no máximo uma unidade (confirmado).
 3. Ao vender um Funko normal, a posição daquela unidade fica livre. A reposição deve poder reutilizar espaços vazios antes de abrir nova caixa.
 4. Novas caixas numeradas são criadas com o próximo número sequencial; os números não são renumerados nem reutilizados (numeração permanente confirmada).
@@ -275,4 +276,4 @@ Este fluxo ainda precisa ser ajustado ao momento em que o Olist disponibiliza a 
 
 ## Próximos artefatos de análise
 
-Com o modelo de classes e estados detalhado em [02-modelo-do-dominio.md](02-modelo-do-dominio.md), o próximo passo é validar os exemplos de ponta a ponta e então decidir a estrutura do backend e a primeira fatia funcional.
+O escopo, os fluxos e os limites dos serviços já orientam a implementação. A primeira fatia está no `catalog-service`; a entrada física e a alocação de estoque serão o próximo domínio funcional depois de concluir e validar a API básica do catálogo.

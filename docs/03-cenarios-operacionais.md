@@ -7,9 +7,9 @@ Estes exemplos transformam o domínio e as regras de [02-modelo-do-dominio.md](0
 **Situação:** chegam produtos à loja e o operador registra a entrada pelo nome definido no catálogo e utilizado na Olist.
 
 1. O operador digita o nome e o sistema afunila a lista de produtos existentes enquanto ele escreve.
-2. Os resultados mostram nome, número da figura, SKU/código de barras e saldo/localização para distinguir itens parecidos.
+2. Os resultados mostram nome, franquia, número da figura, SKU/EAN e saldo/localização para distinguir itens parecidos; a busca também pode ser feita pela franquia ou pelo número da figura.
 3. Se o produto existir, o operador seleciona e o sistema carrega seus dados; produtos com saldo zero também aparecem para permitir reposição.
-4. Se não houver correspondência, o operador inicia o cadastro usando o nome definido pela loja (igual ao da Olist) e informa o SKU único e demais dados de identificação.
+4. Se não houver correspondência, o operador inicia o cadastro usando o nome definido pela loja (igual ao da Olist) e informa franquia, SKU e EAN únicos, tipo e número obrigatório da figura.
 5. O operador informa quantidade recebida. O sistema sugere posições livres, reutilizando espaços em caixas existentes antes de propor uma nova caixa; o operador pode ajustar essa alocação.
 6. Depois de revisar e confirmar as posições sugeridas ou ajustadas, o operador confirma a entrada.
 

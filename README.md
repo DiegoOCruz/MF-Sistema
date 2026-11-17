@@ -46,7 +46,7 @@ MF_Sistema/
 
 ## Local development
 
-The current Docker Compose setup runs the `catalog-service` and its PostgreSQL 17 database. The Compose file is at the repository root; the local `.env` file there supplies `POSTGRES_PASSWORD` and is ignored by Git. Flyway manages the database schema through versioned SQL files in `backend/catalog-service/src/main/resources/db/migration`. Migration `V1__create_produtos.sql` creates the initial `produtos` table.
+The current Docker Compose setup runs the `catalog-service` and its PostgreSQL 17 database. The Compose file is at the repository root; the local `.env` file there supplies `POSTGRES_PASSWORD` and is ignored by Git. Flyway manages the database schema through versioned SQL files in `backend/catalog-service/src/main/resources/db/migration`. Migration `V1__create_produtos.sql` creates the initial `produtos` table, and `V2__add_franquia_to_produtos.sql` adds the product franchise.
 
 Run these commands from the repository root:
 
@@ -57,7 +57,7 @@ docker compose logs --tail=100 catalog-service
 docker compose exec catalog-db psql -U catalog_user -d catalog_db
 ```
 
-The service is published at `http://localhost:8081` and PostgreSQL at `localhost:5432`. The named `catalog_db_data` volume keeps database data when containers stop. `docker compose down -v` also deletes that volume and its data. The `produto_laboratorio` table used for SQL practice was temporary and is not part of the application schema.
+The service is published at `http://localhost:8081` and PostgreSQL at `localhost:5432`. The current catalog endpoint supports partial name search: `GET /produtos?nome=...`, returning product response DTOs. The service layer also has searches by franchise and figure number; their HTTP endpoints have not been added yet. The named `catalog_db_data` volume keeps database data when containers stop. `docker compose down -v` also deletes that volume and its data. The `produto_laboratorio` table used for SQL practice was temporary and is not part of the application schema.
 
 ## Initial architecture
 
@@ -87,7 +87,7 @@ Each service will have clear boundaries and own its data. Olist remains responsi
 - Prefer immutability where it makes sense. Persisted entities may need specific constructors and JPA mappings; we will handle that without exposing public setters.
 - Use inheritance sparingly, when there is a stable “is-a” relationship. Prefer composition when it better represents the domain.
 - Versioned APIs, input validation, consistent error handling, logs, and automated tests focused on business rules.
-- Automated tests are part of the project plan. Their implementation is intentionally deferred until after the initial domain and persistence learning steps.
+- Automated tests are part of the project plan. The initial Spring context test has passed; tests for catalog rules and search behavior remain planned for later implementation.
 - Use Docker and Docker Compose to run the application and its dependencies locally.
 
 ## Development roadmap

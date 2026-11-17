@@ -8,7 +8,7 @@ Um microserviço representa uma capacidade de negócio e é dono dos dados e das
 
 | Serviço | Dono dos dados e regras | Não é responsável por |
 | --- | --- | --- |
-| `catalog-service` | Produtos: nome usado pela loja e na Olist, SKU, EAN/código de barras e número da figura. | Saldos e localizações físicas. |
+| `catalog-service` | Produtos: nome usado pela loja e na Olist, franquia, SKU, EAN/código de barras, tipo e número da figura; pesquisa por nome, franquia e número. | Saldos e localizações físicas. |
 | `inventory-service` | Entrada física digitada, caixas numeradas e posições, embalagens de envio distintas para Funkos médios e grandes, saldo legado, movimentações e separação pré-nota física. | Valor líquido de marketplace e conciliação bancária. |
 | `sales-fulfillment-service` | Venda presencial, importação manual do XML da NF de venda, ID do marketplace, conferência, embalagem, vídeo e registro de cancelamento/devolução. | Saldo e posição física como fonte de verdade. |
 | `finance-service` | Líquido previsto e componentes da venda, crédito individual recebido e conciliação manual com o extrato. | Cadastro de produtos ou localização de estoque. |
@@ -40,7 +40,7 @@ sequenceDiagram
     participant Cat as catalog-service
     Operador->>UI: Digita o nome usado no catálogo/Olist
     UI->>Cat: Buscar produtos pelo nome digitado
-    Cat-->>UI: Lista afunilada com SKU, número e saldo/local
+    Cat-->>UI: Lista afunilada com franquia, SKU, número e saldo/local
     alt Produto encontrado
         Operador->>UI: Seleciona produto
         UI->>Inv: Informar quantidade e solicitar sugestão de posições

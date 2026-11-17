@@ -6,7 +6,7 @@ Este documento detalha o rascunho de [escopo e domínio](01-escopo-e-dominio.md)
 
 As primeiras áreas do sistema são:
 
-- **Catálogo:** nome definido pela loja, SKU, código de barras e número da figura.
+- **Catálogo:** nome definido pela loja, franquia, SKU, EAN/código de barras, tipo e número da figura.
 - **Estoque:** entrada física, endereço da unidade e histórico de movimentação.
 - **Venda e expedição:** retirada pré-nota, importação manual do XML da NF, conferência e embalagem.
 - **Financeiro:** valor líquido previsto por venda, crédito individual posterior e conciliação manual.
@@ -18,7 +18,7 @@ O Olist continua cuidando de pedidos de marketplace, emissão fiscal e etiqueta 
 
 | Classe | Responsabilidade e comportamento |
 | --- | --- |
-| `Produto` | Identidade do item no catálogo: nome da loja, SKU único, EAN/código de barras e, quando aplicável, número da figura. |
+| `Produto` | Identidade do item no catálogo: nome da loja, franquia, SKU único, EAN único, tipo e número da figura obrigatório. A busca pode usar nome parcial, franquia ou número da figura. |
 | `HistoricoAlteracaoProduto` | Registra correções com campo, valor anterior e novo, usuário, data e motivo. O ID do produto permanece estável. |
 | `EntradaMercadoria` | Registra o recebimento físico digitado pelo operador; sugere posições livres e só confirma o estoque depois de o operador revisar e confirmar a alocação. |
 | `ItemEntrada` | Guarda o produto selecionado do catálogo, a quantidade recebida e as posições sugeridas/ajustadas pelo operador. |
@@ -48,7 +48,8 @@ classDiagram
         -String sku
         -String ean
         -String nomeCatalogo
-        -Integer numeroFigura
+        -String numeroFigura
+        -String franquia
         -TipoProduto tipoProduto
         +corrigirNome(...)
         +corrigirSku(...)
@@ -321,9 +322,9 @@ stateDiagram-v2
 
 ## Regras de consistência que devem virar código
 
-1. SKU e código de barras identificam o produto sem duplicidade, quando disponíveis.
-2. A entrada é registrada manualmente: a busca por nome filtra produtos do catálogo e mostra SKU, número da figura, código de barras e saldo/localização para confirmar a escolha.
-3. Se não encontrar o produto, o operador pode cadastrá-lo com o nome usado na loja e na Olist, SKU único e dados de identificação disponíveis.
+1. Todos os produtos têm SKU e EAN únicos; o número da figura também é obrigatório.
+2. A entrada é registrada manualmente: a busca pode filtrar por nome parcial, franquia ou número da figura e mostra SKU, EAN e saldo/localização para confirmar a escolha.
+3. Se não encontrar o produto, o operador pode cadastrá-lo com o nome usado na loja e na Olist, franquia, SKU, EAN, tipo e número da figura.
 4. O XML do fornecedor não é requisito para registrar a entrada física; nomes e códigos fiscais do fornecedor não alteram o cadastro do produto.
 5. Uma caixa numerada tem seis posições; cada posição aceita zero ou uma unidade. Seu número é permanente e as posições vazias são reutilizadas antes de abrir uma nova caixa.
 6. Na entrada, o sistema sugere posições vazias existentes antes de propor uma nova caixa; o operador pode ajustar a seleção antes de confirmar.
@@ -340,4 +341,4 @@ stateDiagram-v2
 
 ## Próxima validação
 
-Antes do código, vamos transformar as transições acima em exemplos concretos: uma entrada manual de Funko normal, uma reposição em caixa `SN`, um Funko vendido e um crédito de marketplace conciliado. Depois escolhemos quais agregados pertencem ao primeiro serviço backend e definimos os módulos do repositório.
+As decisões iniciais já foram documentadas e a implementação começou pelo `catalog-service`. O modelo de `Produto` foi separado da entidade JPA; o repositório e o adaptador fazem a persistência; o serviço concentra as operações do catálogo. O próximo recorte é validar a API de busca e cadastro e, depois, desenhar em código a entrada física e a alocação nas caixas/posições.
