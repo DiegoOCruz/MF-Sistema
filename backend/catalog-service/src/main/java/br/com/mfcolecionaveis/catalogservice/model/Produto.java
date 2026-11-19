@@ -4,7 +4,7 @@ import br.com.mfcolecionaveis.catalogservice.model.vo.Nome;
 import br.com.mfcolecionaveis.catalogservice.model.vo.NumeroFigura;
 import br.com.mfcolecionaveis.catalogservice.model.vo.Sku;
 import br.com.mfcolecionaveis.catalogservice.model.vo.Ean;
-
+import br.com.mfcolecionaveis.catalogservice.model.vo.Franquia;
 import lombok.Getter;
 import java.util.UUID;
 
@@ -16,20 +16,23 @@ public class Produto {
     private Ean ean;
     private TipoProduto tipoProduto;
     private NumeroFigura numeroFigura;
+    private Franquia franquia;
     private boolean ativo;
 
-    public Produto(Nome nome, Sku sku, Ean ean, TipoProduto tipoProduto, NumeroFigura numeroFigura, boolean ativo) {
+    public Produto(Nome nome, Sku sku, Ean ean, TipoProduto tipoProduto, NumeroFigura numeroFigura, Franquia franquia,
+            boolean ativo) {
         this.id = UUID.randomUUID();
         this.nome = nome;
         this.sku = sku;
         this.ean = ean;
         this.tipoProduto = tipoProduto;
         this.numeroFigura = numeroFigura;
+        this.franquia = franquia;
         this.ativo = ativo;
     }
 
     private Produto(UUID id, Nome nome, Sku sku, Ean ean,
-            TipoProduto tipoProduto, NumeroFigura numeroFigura,
+            TipoProduto tipoProduto, NumeroFigura numeroFigura, Franquia franquia,
             boolean ativo) {
         this.id = id;
         this.nome = nome;
@@ -37,13 +40,14 @@ public class Produto {
         this.ean = ean;
         this.tipoProduto = tipoProduto;
         this.numeroFigura = numeroFigura;
+        this.franquia = franquia;
         this.ativo = ativo;
     }
 
     public static Produto reconstituir(UUID id, Nome nome, Sku sku, Ean ean,
-            TipoProduto tipoProduto, NumeroFigura numeroFigura,
+            TipoProduto tipoProduto, NumeroFigura numeroFigura, Franquia franquia,
             boolean ativo) {
-        return new Produto(id, nome, sku, ean, tipoProduto, numeroFigura, ativo);
+        return new Produto(id, nome, sku, ean, tipoProduto, numeroFigura, franquia, ativo);
     }
 
     public void ativar() {
@@ -93,6 +97,22 @@ public class Produto {
             throw new IllegalArgumentException("Novo número da figura é igual ao número da figura atual");
         }
         this.numeroFigura = numeroFigura;
+    }
+
+    public void atualizarFranquia(Franquia franquia) {
+        if (this.franquia.equals(franquia)) {
+            throw new IllegalArgumentException("Nova Franquia é igual a franquia atual");
+        }
+        this.franquia = franquia;
+    }
+
+    public void atualizarDadosCadastrais(DadosCadastraisProduto dados) {
+        this.nome = dados.nome();
+        this.sku = dados.sku();
+        this.ean = dados.ean();
+        this.tipoProduto = dados.tipoProduto();
+        this.numeroFigura = dados.numeroFigura();
+        this.franquia = dados.franquia();
     }
 
 }

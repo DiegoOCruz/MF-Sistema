@@ -44,12 +44,15 @@ public class ProdutoEntity  {
     @Column (nullable = false)
     private boolean ativo;
 
+    @Column (nullable = false, length = 100)
+    private String franquia;
+
     protected ProdutoEntity() {
         // Construtor protegido para uso do JPA
     }
 
     public ProdutoEntity(UUID id, String nome, String sku, String ean,
-                     TipoProduto tipoProduto, String numeroFigura,
+                     TipoProduto tipoProduto, String numeroFigura, String franquia,
                      boolean ativo) {
     this.id = id;
     this.nome = nome;
@@ -57,6 +60,7 @@ public class ProdutoEntity  {
     this.ean = ean;
     this.tipoProduto = tipoProduto;
     this.numeroFigura = numeroFigura;
+    this.franquia = franquia;
     this.ativo = ativo;
 }
 

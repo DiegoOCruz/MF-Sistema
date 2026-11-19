@@ -1,0 +1,2 @@
+ALTER TABLE produtos
+ADD COLUMN franquia VARCHAR(100) NOT NULL;

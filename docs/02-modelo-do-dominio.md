@@ -341,4 +341,4 @@ stateDiagram-v2
 
 ## Próxima validação
 
-As decisões iniciais já foram documentadas e a implementação começou pelo `catalog-service`. O modelo de `Produto` foi separado da entidade JPA; o repositório e o adaptador fazem a persistência; o serviço concentra as operações do catálogo. O próximo recorte é validar a API de busca e cadastro e, depois, desenhar em código a entrada física e a alocação nas caixas/posições.
+As decisões iniciais já foram documentadas e a implementação começou pelo `catalog-service`. O modelo de `Produto` foi separado da entidade JPA; o repositório e o adaptador fazem a persistência; `ProdutoService` coordena as operações e `ProdutoValidator` concentra as regras de unicidade. As rotas de catálogo foram exercitadas manualmente contra PostgreSQL. Em 19/11, `mvn test` passou com 23 testes de contexto, service e validação. O próximo recorte é padronizar os erros HTTP, testar o controller e depois desenhar a entrada física e a alocação nas caixas/posições.

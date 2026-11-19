@@ -57,7 +57,7 @@ docker compose logs --tail=100 catalog-service
 docker compose exec catalog-db psql -U catalog_user -d catalog_db
 ```
 
-O serviço fica disponível em `http://localhost:8081` e o PostgreSQL em `localhost:5432`. O endpoint atual do catálogo permite busca parcial por nome: `GET /produtos?nome=...`, retornando DTOs de resposta. O serviço também possui buscas por franquia e número da figura; esses endpoints HTTP ainda não foram criados. O volume nomeado `catalog_db_data` mantém os dados do banco quando os containers param. `docker compose down -v` também remove esse volume e os dados. A tabela `produto_laboratorio` usada na prática de SQL era temporária e não faz parte do esquema da aplicação.
+O serviço fica disponível em `http://localhost:8081` e o PostgreSQL em `localhost:5432`. As rotas do catálogo incluem `GET /produtos`, `GET /produtos/{id}`, buscas por nome, franquia e número da figura, `POST /produtos`, `PUT /produtos/{id}`, `DELETE /produtos/{id}` (desativação lógica) e `PATCH /produtos/{id}/ativar`. O `DELETE` e a ativação respondem `204 No Content`. A suíte Maven tem 23 testes aprovados entre contexto, service e validações; as rotas também foram exercitadas manualmente com PostgreSQL. O volume nomeado `catalog_db_data` mantém os dados do banco quando os containers param. `docker compose down -v` também remove esse volume e os dados. A tabela `produto_laboratorio` usada na prática de SQL era temporária e não faz parte do esquema da aplicação.
 
 ## Arquitetura inicial
 
@@ -87,7 +87,7 @@ Serviços terão limites claros e serão donos dos próprios dados. A Olist cont
 - Imutabilidade sempre que fizer sentido. Entidades persistidas podem precisar de construtores e mapeamentos específicos do JPA; isso será tratado sem expor setters públicos.
 - Herança será usada com parcimônia, quando houver uma relação “é um” estável. Composição será preferida quando representar melhor o domínio.
 - APIs versionadas, validação de entrada, tratamento consistente de erros, logs e testes automatizados focados nas regras de negócio.
-- Testes automatizados fazem parte do projeto. O teste inicial de contexto do Spring passou; testes das regras do catálogo e do comportamento das buscas ficam para uma etapa posterior.
+- Testes automatizados fazem parte do projeto. Em 19/11, `mvn test` passou com 23 testes de contexto, service e validações. Testes automatizados do controller ainda estão pendentes.
 - Docker e Docker Compose para executar a aplicação e suas dependências localmente.
 
 ## Caminho de construção
